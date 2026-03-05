@@ -5,6 +5,7 @@ const hostelSchema=new mongoose.Schema({
   location: {type: String, required: true},
   rating: {type: Number, default: 0},
   price: {type: Number, required: true},
+  discountedPrice: {type: Number, default: 0},
   gender: {type: String, required: true},
   established: {type: Number},
   description: {type: String},
