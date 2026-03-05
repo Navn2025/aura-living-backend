@@ -7,6 +7,7 @@ const Admin=require('../models/admin.model');
 const Hostel=require('../models/hostel.model');
 const Contact=require('../models/contact.model');
 const Review=require('../models/review.model');
+const SiteSettings=require('../models/siteSettings.model');
 
 const JWT_SECRET=process.env.JWT_SECRET||'gurukul_secret_key_2024';
 
@@ -207,6 +208,37 @@ router.delete('/reviews/:id', authMiddleware, async (req, res) =>
     const review=await Review.findByIdAndDelete(req.params.id);
     if (!review) return res.status(404).json({message: 'Review not found'});
     res.json({message: 'Review deleted successfully'});
+  } catch (error)
+  {
+    res.status(500).json({message: error.message});
+  }
+});
+
+/* ══════════════ SITE SETTINGS (images) ══════════════ */
+
+router.get('/site-settings', authMiddleware, async (req, res) =>
+{
+  try
+  {
+    let settings=await SiteSettings.findOne();
+    if (!settings) settings=await SiteSettings.create({});
+    res.json(settings);
+  } catch (error)
+  {
+    res.status(500).json({message: error.message});
+  }
+});
+
+router.put('/site-settings', authMiddleware, async (req, res) =>
+{
+  try
+  {
+    let settings=await SiteSettings.findOne();
+    if (!settings) settings=await SiteSettings.create({});
+    const fields=['heroBg', 'heroMain', 'heroSub', 'aboutImage', 'exploreImages', 'homeFeelImage', 'hostelHeroBg', 'hostelArchImages'];
+    fields.forEach(f => {if (req.body[f]!==undefined) settings[f]=req.body[f];});
+    await settings.save();
+    res.json(settings);
   } catch (error)
   {
     res.status(500).json({message: error.message});
