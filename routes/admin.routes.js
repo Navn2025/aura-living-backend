@@ -6,6 +6,7 @@ const {v2: cloudinary}=require('cloudinary');
 const Admin=require('../models/admin.model');
 const Hostel=require('../models/hostel.model');
 const Contact=require('../models/contact.model');
+const Review=require('../models/review.model');
 
 const JWT_SECRET=process.env.JWT_SECRET||'gurukul_secret_key_2024';
 
@@ -167,6 +168,45 @@ router.delete('/contacts/:id', authMiddleware, async (req, res) =>
     const contact=await Contact.findByIdAndDelete(req.params.id);
     if (!contact) return res.status(404).json({message: 'Contact not found'});
     res.json({message: 'Contact deleted successfully'});
+  } catch (error)
+  {
+    res.status(500).json({message: error.message});
+  }
+});
+
+/* ── Reviews ── */
+router.get('/reviews', authMiddleware, async (req, res) =>
+{
+  try
+  {
+    const reviews=await Review.find().sort({createdAt: -1});
+    res.json(reviews);
+  } catch (error)
+  {
+    res.status(500).json({message: error.message});
+  }
+});
+
+router.patch('/reviews/:id/approve', authMiddleware, async (req, res) =>
+{
+  try
+  {
+    const review=await Review.findByIdAndUpdate(req.params.id, {approved: req.body.approved}, {new: true});
+    if (!review) return res.status(404).json({message: 'Review not found'});
+    res.json(review);
+  } catch (error)
+  {
+    res.status(500).json({message: error.message});
+  }
+});
+
+router.delete('/reviews/:id', authMiddleware, async (req, res) =>
+{
+  try
+  {
+    const review=await Review.findByIdAndDelete(req.params.id);
+    if (!review) return res.status(404).json({message: 'Review not found'});
+    res.json({message: 'Review deleted successfully'});
   } catch (error)
   {
     res.status(500).json({message: error.message});
